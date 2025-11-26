@@ -93,50 +93,50 @@ class Ws extends REST_Controller
         }
     }
 
-    // function _login($data)
-    // {
-    //     $data = $data[0];
-    //     $arr = $this->ws_model->login($data);
-    //     $this->response([
-    //         'status' => TRUE,
-    //         'message' => 'success',
-    //         'data' => $arr
-    //     ], REST_Controller::HTTP_OK);
-    // }
-
     function _login($data)
     {
         $data = $data[0];
-
-        // Check login
         $arr = $this->ws_model->login($data);
-
-        // Store session only if login success
-        if (!empty($arr)) {
-
-            $session_data = array(
-                'user_id'     => $arr['user_id'],
-                'role_id'     => $arr['role_id'],
-                'district_id' => $arr['district_id'],
-                'name'        => $arr['name'],
-                'designation' => $arr['designation'],
-                'mobile'      => $arr['mobile'],
-                'email'       => $arr['email'],
-                'photo'       => $arr['photo'],
-                'logged_in'   => TRUE
-            );
-
-            // Save to session
-            $this->session->set_userdata($session_data);
-        }
-
-        // API Response
         $this->response([
-            'status'  => !empty($arr),
-            'message' => !empty($arr) ? 'success' : 'Invalid Login',
-            'data'    => $arr
+            'status' => TRUE,
+            'message' => 'success',
+            'data' => $arr
         ], REST_Controller::HTTP_OK);
     }
+
+    // function _login($data)
+    // {
+    //     $data = $data[0];
+
+    //     // Check login
+    //     $arr = $this->ws_model->login($data);
+
+    //     // Store session only if login success
+    //     if (!empty($arr)) {
+
+    //         $session_data = array(
+    //             'user_id'     => $arr['user_id'],
+    //             'role_id'     => $arr['role_id'],
+    //             'district_id' => $arr['district_id'],
+    //             'name'        => $arr['name'],
+    //             'designation' => $arr['designation'],
+    //             'mobile'      => $arr['mobile'],
+    //             'email'       => $arr['email'],
+    //             'photo'       => $arr['photo'],
+    //             'logged_in'   => TRUE
+    //         );
+
+    //         // Save to session
+    //         $this->session->set_userdata($session_data);
+    //     }
+
+    //     // API Response
+    //     $this->response([
+    //         'status'  => !empty($arr),
+    //         'message' => !empty($arr) ? 'success' : 'Invalid Login',
+    //         'data'    => $arr
+    //     ], REST_Controller::HTTP_OK);
+    // }
 
 
     // srrp
@@ -226,10 +226,10 @@ class Ws extends REST_Controller
 
     function get_district_list_api()
     {
-        $session = $this->session->userdata();
-        
-        $district_list = $this->common->get_district_list($session['district_id']);
+        // $session = $this->session->userdata();
 
+        // $district_list = $this->common->get_district_list($session['district_id']);
+        $district_list = $this->common->get_district_list();
         $this->response([
             'status' => true,
             'message' => 'success',
