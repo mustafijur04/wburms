@@ -56,9 +56,15 @@ class Common_Model extends CI_Model {
         return $query->result() ?: [];
     }
 
-    function get_district_list() {
+    function get_district_list($id = null) {
         $session = $this->get_session();
-        $district_ids = $session['district_id'] ?? 0;
+        if($id != null){
+            $district_ids = $id;
+        }elseif($id == null){
+            $district_ids = $session['district_id'] ?? 0;
+        }else{
+            $district_ids = $session['district_id'] ?? 0;
+        }
 
         $this->db->distinct();
         $this->db->select('id, name');

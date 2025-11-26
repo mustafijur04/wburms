@@ -93,16 +93,51 @@ class Ws extends REST_Controller
         }
     }
 
+    // function _login($data)
+    // {
+    //     $data = $data[0];
+    //     $arr = $this->ws_model->login($data);
+    //     $this->response([
+    //         'status' => TRUE,
+    //         'message' => 'success',
+    //         'data' => $arr
+    //     ], REST_Controller::HTTP_OK);
+    // }
+
     function _login($data)
     {
         $data = $data[0];
+
+        // Check login
         $arr = $this->ws_model->login($data);
+
+        // Store session only if login success
+        if (!empty($arr)) {
+
+            $session_data = array(
+                'user_id'     => $arr['user_id'],
+                'role_id'     => $arr['role_id'],
+                'district_id' => $arr['district_id'],
+                'name'        => $arr['name'],
+                'designation' => $arr['designation'],
+                'mobile'      => $arr['mobile'],
+                'email'       => $arr['email'],
+                'photo'       => $arr['photo'],
+                'logged_in'   => TRUE
+            );
+
+            // Save to session
+            $this->session->set_userdata($session_data);
+        }
+
+        // API Response
         $this->response([
-            'status' => TRUE,
-            'message' => 'success',
-            'data' => $arr
+            'status'  => !empty($arr),
+            'message' => !empty($arr) ? 'success' : 'Invalid Login',
+            'data'    => $arr
         ], REST_Controller::HTTP_OK);
     }
+
 
     // srrp
     function _change_password($data)
@@ -147,85 +182,7 @@ class Ws extends REST_Controller
         ], REST_Controller::HTTP_OK);
     }
 
-
-    // function survey_api()
-    // {
-    //     $session = $this->common->get_session();
-
-    //     $input_request = json_decode(file_get_contents('php://input'), true);
-    //     $input = $input_request['WS_DATA'][0] ?? [];
-
-    //     // ---- VALIDATION FOR REQUIRED FIELDS ---- //
-    //     if (empty($input['district_id'])) {
-    //         $this->response([
-    //             'status' => false,
-    //             'message' => 'district_id is required'
-    //         ], REST_Controller::HTTP_BAD_REQUEST);
-    //         return;
-    //     }
-
-    //     if (empty($input['block_id'])) {
-    //         $this->response([
-    //             'status' => false,
-    //             'message' => 'block_id is required'
-    //         ], REST_Controller::HTTP_BAD_REQUEST);
-    //         return;
-    //     }
-
-    //     if (empty($input['name_id'])) {
-    //         $this->response([
-    //             'status' => false,
-    //             'message' => 'name is required'
-    //         ], REST_Controller::HTTP_BAD_REQUEST);
-    //         return;
-    //     }
-
-    //     // ---- SELECTED VALUES DEFAULT ---- //
-    //     $selected = [
-    //         'district_id' => $input['district_id'],
-    //         'block_id'    => $input['block_id'],
-    //         'gp_id'       => $input['gp_id'] ?? 0,
-    //         'name_id'     => $input['name_id']
-    //     ];
-
-    //     // ---- DISTRICT LIST ---- //
-    //     $district_list = $this->common->get_district_list();
-
-    //     // ---- BLOCK LIST ---- //
-    //     $block_list = $this->common->get_block_list($selected['district_id']);
-
-    //     // ---- GP LIST ---- //
-    //     $gp_list = $this->common->get_gp_list($selected['block_id']);
-
-    //     // ---- NAME LIST ---- //
-    //     $name_list = $this->ws_model->get_name_list(
-    //         $selected['block_id'],
-    //         $selected['gp_id']
-    //     );
-
-    //     // ---- SURVEY RESULT ---- //
-    //     $survey_list = $this->ws_model->get_survey_list(
-    //         $selected['district_id'],
-    //         $selected['block_id'],
-    //         $selected['gp_id'],
-    //         $selected['name_id']
-    //     );
-
-    //     // ---- RESPONSE ---- //
-    //     $this->response([
-    //         'status' => true,
-    //         'message' => 'success',
-    //         'data' => [
-    //             'district_list' => $district_list,
-    //             'block_list'    => $block_list,
-    //             'gp_list'       => $gp_list,
-    //             'name_list'     => $name_list,
-    //             'selected'      => $selected,
-    //             'survey'        => $survey_list
-    //         ]
-    //     ], REST_Controller::HTTP_OK);
-    // }
-
+    //  SURVEY SAVE 
     function survey_submit_api()
     {
         $request = json_decode(file_get_contents("php://input"), true);
@@ -269,7 +226,9 @@ class Ws extends REST_Controller
 
     function get_district_list_api()
     {
-        $district_list = $this->common->get_district_list();
+        $session = $this->session->userdata();
+        
+        $district_list = $this->common->get_district_list($session['district_id']);
 
         $this->response([
             'status' => true,
@@ -375,7 +334,7 @@ class Ws extends REST_Controller
         $this->response([
             'status' => true,
             'message' => 'success',
-            'survey'  => $survey_list
+            'data'  => $survey_list
         ], 200);
     }
 
